@@ -27,6 +27,15 @@ proc createDb() =
     );""")
 
   db.exec(sql"""
+    -- all times are in milliseconds
+    create table if not exists TimeInfo(
+      id integer primary key,
+      user_time real,
+      kernel_time real,
+      total_time real
+    );""")
+
+  db.exec(sql"""
     create table if not exists TestResult(
       id integer primary key,
       name varchar(100) not null,
@@ -39,7 +48,11 @@ proc createDb() =
       expected varchar(10000) not null,
       given varchar(10000) not null,
       created timestamp not null default (DATETIME('now')),
+      compile_time int,
+      run_time int,
 
+      foreign key (compile_time) references TimeInfo(id),
+      foreign key (run_time) references TimeInfo(id),
       foreign key ([commit]) references [commit](id),
       foreign key (machine) references machine(id)
     );""")
