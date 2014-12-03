@@ -82,7 +82,7 @@ when not defined(ssl):
   type PSSLContext = ref object
   let defaultSSLContext: PSSLContext = nil
 else:
-  let defaultSSLContext = newContext(verifyMode = CVerifyNone)
+  let defaultSSLContext = newContext()
 
 proc connect*(address: string, port = Port(25), 
               ssl = false, debug = false,

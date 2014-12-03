@@ -167,7 +167,7 @@ when defined(ssl):
       if SSL_CTX_check_private_key(ctx) != 1:
         raiseSSLError("Verification of private key file failed.")
 
-  proc newContext*(protVersion = protSSLv23, verifyMode = CVerifyPeer,
+  proc newContext*(protVersion = protTLSv1, verifyMode = CVerifyPeer,
                    certFile = "", keyFile = ""): SSLContext =
     ## Creates an SSL context.
     ## 

@@ -275,7 +275,7 @@ when not defined(ssl):
   type SSLContext = ref object
   let defaultSSLContext: SSLContext = nil
 else:
-  let defaultSSLContext = newContext(verifyMode = CVerifyNone)
+  let defaultSSLContext = newContext()
 
 proc newProxy*(url: string, auth = ""): Proxy =
   ## Constructs a new ``TProxy`` object.

@@ -284,8 +284,8 @@ when defined(ssl):
       if SSL_CTX_check_private_key(ctx) != 1:
         raiseSslError("Verification of private key file failed.")
 
-  proc newContext*(protVersion = protSSLv23, verifyMode = CVerifyPeer,
-                   certFile = "", keyFile = ""): SSLContext =
+  proc newContext*(protVersion = protTLSv1, verifyMode = CVerifyPeer,
+                   certFile = "", keyFile = "", certificateBundlePath: string): SSLContext =
     ## Creates an SSL context.
     ## 
     ## Protocol version specifies the protocol to use. SSLv2, SSLv3, TLSv1 are 
@@ -325,8 +325,12 @@ when defined(ssl):
     if newCTX == nil:
       raiseSslError()
 
+    # return code doesn't signify failure, ignore it
     discard newCTX.SSLCTXSetMode(SSL_MODE_AUTO_RETRY)
+
     newCTX.loadCertificates(certFile, keyFile)
+    if not newCTX.SSL_CTX_load_verify_locations("/home/user/tmp/ca-bundle.crt", nil):
+      raiseSslError("Unable to load certificate bundle")
     return SSLContext(newCTX)
 
   proc wrapSocket*(ctx: SSLContext, socket: Socket) =
