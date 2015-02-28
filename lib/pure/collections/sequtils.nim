@@ -47,6 +47,37 @@ proc concat*[T](seqs: varargs[seq[T]]): seq[T] =
       result[i] = itm
       inc(i)
 
+proc repeat*[T](n: int, s: seq[T]): seq =
+  ## Returns a new sequence with the items of `s` repeated `n` times.
+  ##
+  ## Example:
+  ##
+  ## .. code-block::
+  ##   let
+  ##     s = @[1, 2, 3]
+  ##     total = repeat(3, s)
+  ##   assert total == @[1, 2, 3, 1, 2, 3, 1, 2, 3]
+  result = newSeq[T](n * s.len)
+  var o = 0
+  for x in 1..n:
+    for e in s:
+      result[o] = e
+      inc o
+
+template repeat*[T](s: seq[T], n: int): seq = repeat(n, s)
+  ## Returns a new sequence with the items of `s` repeated `n` times.
+  ##
+  ## Version wih parameters swapped
+  ##
+  ## Example:
+  ##
+  ## .. code-block:
+  ##
+  ##   let
+  ##     s = @[1, 2, 3]
+  ##     total = s.repeat 3
+  ##   assert total == @[1, 2, 3, 1, 2, 3, 1, 2, 3]
+
 proc deduplicate*[T](seq1: seq[T]): seq[T] =
   ## Returns a new sequence without duplicates.
   ##
