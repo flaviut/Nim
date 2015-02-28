@@ -520,6 +520,12 @@ proc repeatStr*(count: int, s: string): string {.noSideEffect,
   result = newStringOfCap(count*s.len)
   for i in 0..count-1: result.add(s)
 
+template repeat*(n: int, s: string): string = repeatStr(n, s)
+  ## Returns String `s` concatenated `n` times.
+
+template repeat*(s: string, n: int): string = repeatStr(n, s)
+  ## Returns String `s` concatenated `n` times (parameter swapped).
+
 proc align*(s: string, count: int, padding = ' '): string {.
   noSideEffect, rtl, extern: "nsuAlignString".} =
   ## Aligns a string `s` with `padding`, so that is of length `count`.
