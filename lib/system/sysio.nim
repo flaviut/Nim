@@ -145,7 +145,7 @@ proc readAllFile(file: File): string =
 proc readAll(file: File): TaintedString = 
   # Separate handling needed because we need to buffer when we
   # don't know the overall length of the File.
-  var len = rawFileSize(file)
+  let len = if file != stdin: rawFileSize(file) else: -1
   if len >= 0:
     result = readAllFile(file, len).TaintedString
   else:
