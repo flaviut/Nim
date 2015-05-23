@@ -130,7 +130,7 @@ proc newModule(fileIdx: int32): PSym =
 
   incl(result.flags, sfUsed)
   initStrTable(result.tab)
-  strTableAdd(result.tab, result) # a module knows itself
+  result.tab.add(result) # a module knows itself
 
 proc compileModule*(fileIdx: int32, flags: TSymFlags): PSym =
   result = getModule(fileIdx)

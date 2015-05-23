@@ -500,7 +500,7 @@ proc processPragma(c: PContext, n: PNode, i: int) =
   var body = newNodeI(nkPragma, n.info)
   for j in i+1 .. sonsLen(n)-1: addSon(body, n.sons[j])
   userPragma.ast = body
-  strTableAdd(c.userPragmas, userPragma)
+  c.userPragmas.add(userPragma)
 
 proc pragmaRaisesOrTags(c: PContext, n: PNode) =
   proc processExc(c: PContext, x: PNode) =
@@ -591,7 +591,7 @@ proc singlePragma(c: PContext, sym: PSym, n: PNode, i: int,
   var it = n.sons[i]
   var key = if it.kind == nkExprColonExpr: it.sons[0] else: it
   if key.kind == nkIdent:
-    var userPragma = strTableGet(c.userPragmas, key.ident)
+    var userPragma = c.userPragmas[key.ident]
     if userPragma != nil:
       inc c.instCounter
       if c.instCounter > 100:

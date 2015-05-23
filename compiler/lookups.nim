@@ -43,7 +43,7 @@ proc considerQuotedIdent*(n: PNode): PIdent =
     result = getIdent"<Error>"
 
 template addSym*(scope: PScope, s: PSym) =
-  strTableAdd(scope.symbols, s)
+  scope.symbols.add(s)
 
 proc addUniqueSym*(scope: PScope, s: PSym): bool =
   result = not strTableIncl(scope.symbols, s)
@@ -79,11 +79,11 @@ proc skipAlias*(s: PSym; n: PNode): PSym =
               s.name.s)
 
 proc localSearchInScope*(c: PContext, s: PIdent): PSym =
-  result = strTableGet(c.currentScope.symbols, s)
+  result = c.currentScope.symbols[s]
 
 proc searchInScopes*(c: PContext, s: PIdent): PSym =
   for scope in walkScopes(c.currentScope):
-    result = strTableGet(scope.symbols, s)
+    result = scope.symbols[s]
     if result != nil: return
   result = nil
 
@@ -99,7 +99,7 @@ proc debugScopes*(c: PContext; limit=0) {.deprecated.} =
 
 proc searchInScopes*(c: PContext, s: PIdent, filter: TSymKinds): PSym =
   for scope in walkScopes(c.currentScope):
-    result = strTableGet(scope.symbols, s)
+    result = scope.symbols[s]
     if result != nil and result.kind in filter: return
   result = nil
 
@@ -175,7 +175,7 @@ proc addDeclAt*(scope: PScope, sym: PSym) =
 proc addInterfaceDeclAux(c: PContext, sym: PSym) =
   if sfExported in sym.flags:
     # add to interface:
-    if c.module != nil: strTableAdd(c.module.tab, sym)
+    if c.module != nil: c.module.tab.add(sym)
     else: internalError(sym.info, "addInterfaceDeclAux")
 
 proc addInterfaceDeclAt*(c: PContext, scope: PScope, sym: PSym) =
@@ -186,7 +186,7 @@ proc addOverloadableSymAt*(scope: PScope, fn: PSym) =
   if fn.kind notin OverloadableSyms:
     internalError(fn.info, "addOverloadableSymAt")
     return
-  let check = strTableGet(scope.symbols, fn.name)
+  let check = scope.symbols[fn.name]
   if check != nil and check.kind notin OverloadableSyms:
     wrongRedefinition(fn.info, fn.name.s)
   else:
@@ -277,9 +277,9 @@ proc qualifiedLookUp*(c: PContext, n: PNode, flags = {checkUndeclared}): PSym =
         ident = considerQuotedIdent(n.sons[1])
       if ident != nil:
         if m == c.module:
-          result = strTableGet(c.topLevelScope.symbols, ident).skipAlias(n)
+          result = c.topLevelScope.symbols[ident].skipAlias(n)
         else:
-          result = strTableGet(m.tab, ident).skipAlias(n)
+          result = m.tab[ident].skipAlias(n)
         if result == nil and checkUndeclared in flags:
           fixSpelling(n.sons[1], ident, searchInScopes)
           localError(n.sons[1].info, errUndeclaredIdentifier, ident.s)

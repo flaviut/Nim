@@ -105,7 +105,7 @@ proc semForFields(c: PContext, n: PNode, m: TMagic): PNode =
   # so that 'break' etc. work as expected, we produce
   # a 'while true: stmt; break' loop ...
   result = newNodeI(nkWhileStmt, n.info, 2)
-  var trueSymbol = strTableGet(magicsys.systemModule.tab, getIdent"true")
+  var trueSymbol = magicsys.systemModule.tab[getIdent"true"]
   if trueSymbol == nil: 
     localError(n.info, errSystemNeeds, "true")
     trueSymbol = newSym(skUnknown, getIdent"true", getCurrOwner(), n.info)
