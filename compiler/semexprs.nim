@@ -893,7 +893,7 @@ proc semDirectOp(c: PContext, n: PNode, flags: TExprFlags): PNode =
 proc buildEchoStmt(c: PContext, n: PNode): PNode =
   # we MUST not check 'n' for semantics again here! But for now we give up:
   result = newNodeI(nkCall, n.info)
-  var e = strTableGet(magicsys.systemModule.tab, getIdent"echo")
+  var e = magicsys.systemModule.tab[getIdent"echo"]
   if e != nil:
     add(result, newSymNode(e))
   else:
@@ -1444,9 +1444,9 @@ proc lookUpForDefined(c: PContext, n: PNode, onlyCurrentScope: bool): PSym =
     if m != nil and m.kind == skModule:
       let ident = considerQuotedIdent(n[1])
       if m == c.module:
-        result = strTableGet(c.topLevelScope.symbols, ident)
+        result = c.topLevelScope.symbols[ident]
       else:
-        result = strTableGet(m.tab, ident)
+        result = m.tab[ident]
   of nkAccQuoted:
     result = lookUpForDefined(c, considerQuotedIdent(n), onlyCurrentScope)
   of nkSym:
@@ -2005,19 +2005,19 @@ proc semExport(c: PContext, n: PNode): PNode =
       localError(a.info, errGenerated, "cannot export: " & renderTree(a))
     elif s.kind == skModule:
       # forward everything from that module:
-      strTableAdd(c.module.tab, s)
+      c.module.tab.add(s)
       x.add(newSymNode(s, a.info))
       var ti: TTabIter
       var it = initTabIter(ti, s.tab)
       while it != nil:
         if it.kind in ExportableSymKinds+{skModule}:
-          strTableAdd(c.module.tab, it)
+          c.module.tab.add(it)
         it = nextIter(ti, s.tab)
     else:
       while s != nil:
         if s.kind in ExportableSymKinds+{skModule}:
           x.add(newSymNode(s, a.info))
-          strTableAdd(c.module.tab, s)
+          c.module.tab.add(s)
         s = nextOverloadIter(o, c, a)
   when false:
     if c.module.ast.isNil:

@@ -480,7 +480,7 @@ proc processInterf(r: PRodReader, module: PSym) =
     inc(r.pos)                # #10
     var s = newStub(r, w, key)
     s.owner = module
-    strTableAdd(module.tab, s)
+    module.tab.add(s)
     idTablePut(r.syms, s, s)
 
 proc processCompilerProcs(r: PRodReader, module: PSym) = 
@@ -496,7 +496,7 @@ proc processCompilerProcs(r: PRodReader, module: PSym) =
       s = newStub(r, w, key)
       s.owner = module
       idTablePut(r.syms, s, s)
-    strTableAdd(rodCompilerprocs, s)
+    rodCompilerprocs.add(s)
 
 proc processIndex(r: PRodReader; idx: var TIndex; outf: File = nil) = 
   var key, val, tmp: int

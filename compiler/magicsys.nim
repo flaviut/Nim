@@ -38,7 +38,7 @@ proc newSysType(kind: TTypeKind, size: int): PType =
   result.align = size.int16
 
 proc getSysSym(name: string): PSym = 
-  result = strTableGet(systemModule.tab, getIdent(name))
+  result = systemModule.tab[getIdent(name)]
   if result == nil: 
     rawMessage(errSystemNeeds, name)
     result = newSym(skError, getIdent(name), systemModule, systemModule.info)
@@ -165,16 +165,16 @@ proc setIntLitType*(result: PNode) =
 
 proc getCompilerProc(name: string): PSym = 
   var ident = getIdent(name, hashIgnoreStyle(name))
-  result = strTableGet(compilerprocs, ident)
+  result = compilerprocs[ident]
   if result == nil:
-    result = strTableGet(rodCompilerprocs, ident)
+    result = rodCompilerprocs[ident]
     if result != nil:
-      strTableAdd(compilerprocs, result)
+      compilerprocs.add(result)
       if result.kind == skStub: loadStub(result)
       if result.kind == skAlias: result = result.owner
 
 proc registerCompilerProc(s: PSym) =
-  strTableAdd(compilerprocs, s)
+  compilerprocs.add(s)
 
 proc finishSystem(tab: TStrTable) = discard
 

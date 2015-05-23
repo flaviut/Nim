@@ -80,7 +80,7 @@ proc semEnum(c: PContext, n: PNode, prev: PType): PType =
     if result.sym != nil and sfExported in result.sym.flags:
       incl(e.flags, sfUsed)
       incl(e.flags, sfExported)
-      if not isPure: strTableAdd(c.module.tab, e)
+      if not isPure: c.module.tab.add(e)
     addSon(result.n, newSymNode(e))
     styleCheckDef(e)
     if sfGenSym notin e.flags and not isPure: addDecl(c, e)

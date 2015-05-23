@@ -36,9 +36,9 @@ proc tableSearch*(t: TTable, key, closure: RootRef,
   # nil is returned
 
 # ----------------------- str table -----------------------------------------
-proc strTableContains*(t: TStrTable, n: PSym): bool
-proc strTableAdd*(t: var TStrTable, n: PSym)
-proc strTableGet*(t: TStrTable, name: PIdent): PSym
+proc contains*(t: TStrTable, n: PSym): bool
+proc add*(t: var TStrTable, n: PSym)
+proc `[]`*(t: TStrTable, name: PIdent): PSym
 
 type
   TTabIter*{.final.} = object # consider all fields here private
@@ -295,7 +295,7 @@ proc tablePut(t: var TTable, key, val: RootRef) =
     tableRawInsert(t.data, key, val)
     inc(t.counter)
 
-proc strTableContains(t: TStrTable, n: PSym): bool =
+proc contains(t: TStrTable, n: PSym): bool =
   var h: THash = n.name.h and high(t.data) # start with real hash value
   while t.data[h] != nil:
     if (t.data[h] == n):
@@ -351,7 +351,7 @@ proc strTableEnlarge(t: var TStrTable) =
     if t.data[i] != nil: strTableRawInsert(n, t.data[i])
   swap(t.data, n)
 
-proc strTableAdd(t: var TStrTable, n: PSym) =
+proc add(t: var TStrTable, n: PSym) =
   if mustRehash(len(t.data), t.counter): strTableEnlarge(t)
   strTableRawInsert(t.data, n)
   inc(t.counter)
@@ -392,7 +392,7 @@ proc strTableIncl*(t: var TStrTable, n: PSym): bool {.discardable.} =
   inc(t.counter)
   result = false
 
-proc strTableGet(t: TStrTable, name: PIdent): PSym =
+proc `[]`(t: TStrTable, name: PIdent): PSym =
   var h: THash = name.h and high(t.data)
   while true:
     result = t.data[h]

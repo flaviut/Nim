@@ -59,7 +59,7 @@ proc rawImportSymbol(c: PContext, s: PSym) =
   # This does not handle stubs, because otherwise loading on demand would be
   # pointless in practice. So importing stubs is fine here!
   # check if we have already a symbol of the same name:
-  var check = strTableGet(c.importTable.symbols, s.name)
+  var check = c.importTable.symbols[s.name]
   if check != nil and check.id != s.id:
     if s.kind notin OverloadableSyms:
       # s and check need to be qualified:
@@ -67,7 +67,7 @@ proc rawImportSymbol(c: PContext, s: PSym) =
       incl(c.ambiguousSymbols, check.id)
   # thanks to 'export' feature, it could be we import the same symbol from
   # multiple sources, so we need to call 'StrTableAdd' here:
-  strTableAdd(c.importTable.symbols, s)
+  c.importTable.symbols.add(s)
   if s.kind == skType:
     var etyp = s.typ
     if etyp.kind in {tyBool, tyEnum} and sfPure notin s.flags:
@@ -94,7 +94,7 @@ proc rawImportSymbol(c: PContext, s: PSym) =
 
 proc importSymbol(c: PContext, n: PNode, fromMod: PSym) =
   let ident = lookups.considerQuotedIdent(n)
-  let s = strTableGet(fromMod.tab, ident)
+  let s = fromMod.tab[ident]
   if s == nil:
     localError(n.info, errUndeclaredIdentifier, ident.s)
   else:
